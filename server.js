@@ -25,7 +25,8 @@ var findUser = function(email, password, db, callback) {
    email: password,
     } , function(err, doc){
         console.log("looked for user")
-        callback(doc != null);
+        #return if the the (email -> password) was found back to the caller
+        callback( (doc != null) );
    });
 };
 
@@ -41,7 +42,7 @@ io.on('connection', function(socket){
 		console.log('User is trying to login');
 		MongoClient.connect(url, function(err, db) {
           assert.equal(null, err);
-
+          #call a function to find (email->password) entry was found and get a response
           findUser(email, password, db, function(found) {
               if(found == true){
                 socket.emit('login_status', 'VERIFIED');
@@ -63,7 +64,7 @@ io.on('connection', function(socket){
               db.close();
           });
         });
-  		socket.emit('login_status', 'VERIFIED');
+  		socket.emit('login_status', 'INSERTED');
     });
 });
 
