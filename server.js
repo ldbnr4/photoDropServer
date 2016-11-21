@@ -1,21 +1,21 @@
 var app = require('express')();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var port = process.env.PORT || 3000;
+var port = 3000;
 
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var ObjectId = require('mongodb').ObjectID;
 var url = 'mongodb://localhost:27017/test';
 
-var insertDocument = function(email, password, db, callback) {
+var insertDocument = function(_email, _password, db, callback) {
     console.log('About to insert user ', email);
    db.collection('users').insertOne( {
-      email : email,
-      password : password
+      email : _email,
+      password : _password
    }, function(err, result) {
     assert.equal(err, null);
-    console.log("Inserted a document into the restaurants collection.");
+    console.log("Inserted ", _email," in to the users collection.");
     callback();
   });
 };
@@ -52,10 +52,10 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
-  console.log('a user connected');
+  console.log('A user has connected');
 
   socket.on('login', function (email, password) {
-		console.log('User is trying to login');
+		console.log('A user is trying to login');
 		MongoClient.connect(url, function(err, db) {
       assert.equal(null, err);
       //call a function to find (email->password) entry was found and get a response
@@ -84,11 +84,11 @@ io.on('connection', function(socket){
               db.close();
           });
         });
-  		socket.emit('login_status', 'INSERTED');
+  		socket.emit('register_status', 'INSERTED');
     });
 });
 
 server.listen(port, function(){
-  console.log('listening on '+port);
+  console.log('listening on ',port);
 });
 
