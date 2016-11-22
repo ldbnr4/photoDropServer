@@ -8,14 +8,16 @@ var assert = require('assert');
 var ObjectId = require('mongodb').ObjectID;
 var url = 'mongodb://localhost:27017/test';
 
-var insertDocument = function(_email, _password, db, callback) {
-    console.log('About to insert user ', email);
+var insertDocument = function(_username, _email, _mobile, _password, db, callback) {
+    console.log('About to insert user ', _username);
    db.collection('users').insertOne( {
+      username : _username,
       email : _email,
+      mobile : _mobile,
       password : _password
    }, function(err, result) {
     assert.equal(err, null);
-    console.log("Inserted ", _email," in to the users collection.");
+    console.log("Inserted", _email,"in to the users collection.");
     callback();
   });
 };
@@ -41,7 +43,7 @@ var findUser = function(_email, _password, db, callback) {
           console.log(doc.password);
         
         //return if the the (email -> password) was found back to the caller
-        callback(false);
+        callback(true);
    });
    //*/
 };
@@ -76,11 +78,11 @@ io.on('connection', function(socket){
       console.log('user disconnected');
     });
 
-  socket.on('register', function (email, password) {
-  		console.log('User ', email, 'is regestrating');
+  socket.on('register', function (username, email, mobile, password) {
+  		console.log('User',username, 'is regestrating');
   		MongoClient.connect(url, function(err, db) {
           assert.equal(null, err);
-          insertDocument(email, password, db, function() {
+          insertDocument(username, email, mobile, password, db, function() {
               db.close();
           });
         });
